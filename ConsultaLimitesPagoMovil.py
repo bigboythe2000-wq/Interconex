@@ -7,7 +7,7 @@ import re
 import pandas as pd
 from LogicaHora import dateAndHourNow
 from playwright.sync_api import sync_playwright
-
+#pruebaPush
 # =========================================================================
 #  FUNCIÓN LOCAL PARA RUTAS ABSOLUTAS EXTERNAS (CORREGIDA PARA .EXE)
 # =========================================================================
