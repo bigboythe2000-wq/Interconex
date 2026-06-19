@@ -9,6 +9,7 @@ from Transferencia import transferir
 from LeerXlsx import guardar_y_cerrar_excel
 from ObtenerRuta import resource_path
 from ListasdeBanco import run as lista_banco
+from AnulacionC2P import AnulacionC2P
 def limpiar_terminal():
     if os.name == 'nt':
         os.system('cls')
@@ -54,7 +55,8 @@ def main():
         print(f"{CYAN}║{RESET}  {VERDE}[5]{RESET} Realizar Pago Móvil                                  {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[6]{RESET} Realizar Transferencias                              {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[7]{RESET} Listar Bancos                                        {CYAN}║{RESET}")
-        print(f"{CYAN}║{RESET}  {AMARILLO}[8]{RESET} Reiniciar el archivo Solicitudes                     {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {VERDE}[8]{RESET} Anuación C2P                                       {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {AMARILLO}[9]{RESET} Reiniciar el archivo Solicitudes                     {CYAN}║{RESET}")
         print(f"{CYAN}╠═══════════════════════════════════════════════════════════╣{RESET}")
         print(f"{CYAN}║{RESET}  {ROJO}[0]{RESET} Salir del Menú                                       {CYAN}║{RESET}")
         print(f"{CYAN}╚═══════════════════════════════════════════════════════════╝{RESET}")
@@ -90,6 +92,10 @@ def main():
             guardar_y_cerrar_excel("Resultados.xlsx")
             lista_banco()
         elif opcion == "8":
+            guardar_y_cerrar_excel("Solicitudes.xlsx")
+            guardar_y_cerrar_excel("Resultados.xlsx")
+            AnulacionC2P()
+        elif opcion == "9":
             guardar_y_cerrar_excel("Solicitudes.xlsx")
             guardar_y_cerrar_excel("Resultados.xlsx")
             reiniciar_archivo_solicitudes()

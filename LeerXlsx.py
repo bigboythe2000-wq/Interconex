@@ -12,45 +12,47 @@ Transferencia = namedtuple('Transferencia',['idEmisor','cuentaEmisor','idRecepto
 
 
 
+import os
+import win32com.client
+
 def guardar_y_cerrar_excel(ruta_archivo):
     """
-    Busca si el archivo Excel indicado está abierto en el sistema,
-    lo guarda y lo cierra de forma segura.
+    Busca si el archivo Excel específico está abierto en la instancia de Excel 
+    y lo guarda/cierra.
     """
-    # Convertir a ruta absoluta para que Excel la reconozca sin problemas
-    #ruta_absoluta = os.path.abspath(ruta_archivo)
-    ruta_absoluta = os.path.dirname(os.path.abspath(__file__))
+    # 1. Obtener la ruta absoluta real del archivo
+    ruta_absoluta = os.path.abspath(ruta_archivo)
     
     if not os.path.exists(ruta_absoluta):
-        print(f"⚠️ El archivo no existe en la ruta: {ruta_absoluta}")
+        print(f"⚠️ El archivo no existe: {ruta_absoluta}")
         return False
 
     try:
-        # Conectarse a la aplicación de Excel que ya esté ejecutándose
+        # Intentar conectar con la instancia de Excel en ejecución
         excel_app = win32com.client.GetActiveObject("Excel.Application")
     except Exception:
-        # If Excel no está abierto en el sistema, no hay nada que cerrar
-        print(f"ℹ️ Excel no está ejecutándose en segundo plano. El archivo '{os.path.basename(ruta_archivo)}' está libre.")
+        print("ℹ️ Excel no está abierto. El archivo está libre.")
         return True
 
     try:
-        # Recorrer todos los libros (Workbooks) abiertos en Excel
+        archivo_encontrado = False
+        # Recorrer todos los libros abiertos
         for workbook in excel_app.Workbooks:
-            # Comparamos las rutas normalizadas
+            # Comparar rutas (normalizando a minúsculas para Windows)
             if os.path.abspath(workbook.FullName).lower() == ruta_absoluta.lower():
-                print(f"💾 Guardando y cerrando '{os.path.basename(ruta_archivo)}' abierto por el usuario...")
+                print(f"💾 Guardando y cerrando '{os.path.basename(ruta_archivo)}'...")
                 workbook.Close(SaveChanges=True)
-                
-                # Si no quedan más libros abiertos, podemos cerrar la aplicación por completo
-                if excel_app.Workbooks.Count == 0:
-                    excel_app.Quit()
-                return True
-                
-        print(f"ℹ️ El archivo '{os.path.basename(ruta_archivo)}' está cerrado en la aplicación de Excel.")
-        return True
+                archivo_encontrado = True
+                break # Salir del bucle al encontrarlo
+
+        if archivo_encontrado:
+            return True
+        else:
+            print(f"ℹ️ El archivo '{os.path.basename(ruta_archivo)}' no estaba abierto en Excel.")
+            return True
 
     except Exception as e:
-        print(f"❌ Error al intentar interactuar con Excel: {e}")
+        print(f"❌ Error al interactuar con Excel: {e}")
         return False
 
 def leerTransferencia(nombreArchivo):
@@ -296,6 +298,34 @@ def leerConsultaLimitesTransferencia():
     except Exception as e:
         print(f"❌ Error al intentar leer el Excel: {e}")
         return []
-# Ejemplo de uso
+
+def leerExcel(nombreHoja, archivo="Solicitudes.xlsx"):
+    """
+    Función única para leer cualquier hoja de 'Solicitudes.xlsx'.
+    """
+    if not os.path.exists(archivo):
+        print(f"❌ Error: No existe el archivo {archivo}")
+        return []
+
+    try:
+        # 1. Leer el archivo, forzando todo a string para mantener integridad de datos
+        df = pd.read_excel(archivo, sheet_name=nombreHoja, engine='openpyxl', dtype=str).fillna('')
+        
+        if df.empty:
+            print(f"⚠️ La hoja '{nombreHoja}' está vacía.")
+            return []
+
+        # 2. Normalizar encabezados (quitar espacios y pasar a minúsculas)
+        df.columns = [str(c).strip().lower() for c in df.columns]
+        
+        # 3. Retornar como lista de diccionarios (formato estándar)
+        return df.to_dict('records')
+
+    except Exception as e:
+        print(f"❌ Error al leer la hoja '{nombreHoja}': {e}")
+        return []
+
+
+# # Ejemplo de uso
 # guardar_y_cerrar_excel("Solicitudes.xlsx")
-# guardar_y_cerrar_excel("Resultados.xlsx")
+# guardar_y_cerrar_excel(resource_path("Resultados.xlsx"))

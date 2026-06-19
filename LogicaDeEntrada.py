@@ -96,3 +96,24 @@ def payLoadListaMovimientos(datos):
         "posicionInicial": entero_o_vacio(datos["posicion"]),
         "tipoListado": entero_o_vacio(datos["listado"])
     }
+
+def escribirPayload(payLoadEstructura, payLoadDatos):
+    """
+    Actualiza la estructura mapeando claves ignorando mayúsculas/minúsculas.
+    """
+    nuevo_payload = payLoadEstructura.copy()
+    
+    # Creamos un diccionario auxiliar de los datos recibidos con las llaves en minúsculas
+    # para que la comparación no falle
+    datos_normalizados = {str(k).lower(): v for k, v in payLoadDatos.items()}
+    
+    for clave in nuevo_payload:
+        clave_min = str(clave).lower()
+        
+        # Si la versión en minúscula de la clave existe en los datos
+        if clave_min in datos_normalizados:
+            # Actualizamos con el valor del Excel
+            nuevo_payload[clave] = datos_normalizados[clave_min]
+            
+    return nuevo_payload
+

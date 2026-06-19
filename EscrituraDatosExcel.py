@@ -216,3 +216,33 @@ def reiniciar_archivo_solicitudes(nombre_archivo="Solicitudes.xlsx"):
     print(
         f" ¡Listo! Archivo '{nombre_archivo}' reiniciado con éxito."
     )
+
+def guardar_payload_en_excel(payload, nombre_archivo, nombre_hoja):
+    """
+    Recibe un diccionario (payload), lo convierte a DataFrame 
+    y lo añade a la hoja indicada.
+    """
+    # Convertimos el diccionario a una lista de un solo elemento para crear el DataFrame
+    # Usamos [payload] para que pandas entienda que es una fila
+    df = pd.DataFrame([payload])
+    
+    # Reutilizamos la función anterior
+    guardar_en_excel(df, nombre_archivo, nombre_hoja)
+    print(f"✅ Payload guardado exitosamente en '{nombre_hoja}'.")
+
+# guardar_payload_en_excel({    
+#   "idCliente": "J1234567",
+#   "idUsuario": "usuario_beca",
+#   "idTerminal": "terminal_beca",
+#   "idCanal": "01",
+#   "idConsumidor": "J1234567",
+#   "ipOrigen": "111.111.11.1",
+#   "idPagador": "V1234567",
+#   "telfPagador": "584141234567",
+#   "telfReceptor": "584141234567",
+#   "ctaReceptor": "0115xxxxxxxxxxxxxxxx",
+#   "moneda": "VES",
+#   "serialOperacion": "91005224827",
+#   "monto": "10.5",
+#   "codBanco": "0115"
+# },"Resultados.xlsx", "prueba")
