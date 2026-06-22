@@ -52,7 +52,6 @@ def leer_datos_entrada_directo(ruta_excel, nombre_pestaña):
     return filas
 
 def limpiar_y_formatear_telefono(valor):
-    """Limpia y normaliza el teléfono estrictamente al formato 58XXXXXXXXX"""
     tel = str(valor).strip().split('.')[0]
     tel = re.sub(r'\D', '', tel)
     if not tel: return ""
@@ -81,7 +80,7 @@ def aplanar_dict(d, parent_key='', sep='_'):
 
 
 # =========================================================================
-#  FASE 1: CONSULTAR Y EXTRAER LA OTP (CON MONTO DINÁMICO VALIDADO)
+#  FASE 1: CONSULTAR Y EXTRAER LA OTP (CON FILTRADO DE RESPUESTA DE ERROR)
 # =========================================================================
 def obtener_otp_swagger(p, registros):
     print("\n🚀 [FASE 1] Iniciando extracción de OTPs de Swagger...")
@@ -109,36 +108,27 @@ def obtener_otp_swagger(p, registros):
             id_pagador = str(fila.get('id_pagador', '')).strip()
             telf_pagador = limpiar_y_formatear_telefono(fila.get('telf_pagador', ''))
             
-            # Captura y conversión del monto dinámico para la OTP
-            monto_raw = str(fila.get('monto', '1.22')).strip()
-            try:
-                monto_otp = float(monto_raw) if monto_raw else 1.22
-            except ValueError:
-                monto_otp = 1.22
-            
-            canal_raw = str(fila.get('id_canal', '1')).strip()
-            canal_otp = str(int(canal_raw)) if canal_raw.isdigit() else "1"
-            
             if not id_pagador:
                 continue
                 
-            print(f"🔍 [{i+1}] Solicitando OTP para Pagador: {id_pagador} | Teléfono: {telf_pagador} | Monto: {monto_otp}")
+            print(f"🔍 [{i+1}] Solicitando OTP para Pagador: {id_pagador} | Teléfono: {telf_pagador}")
             
+            # JSON DE OTP
             payload_otp = {
                 "idSesion": "20210101130101",
-                "canal": canal_otp,
+                "canal": "8",
                 "idTerminal": "123BE",
                 "idConsumidor": "J1234",
-                "idCliente": "J5678",
-                "idUsuario": "J876543210",
+                "idCliente": "V7180776",
+                "idUsuario": "V7180776",
                 "codUsuario": "E7654",
                 "ip": "172.1.1.1",
                 "datosOTP": {
-                    "nroIdCliente": id_pagador,
-                    "telefono": telf_pagador, # Ahora va formateado con 58...
+                    "nroIdCliente": id_pagador, 
+                    "telefono": telf_pagador,   
                     "tipo": 0,
-                    "monto": monto_otp,     # <-- Tomando el monto real del Excel de forma numérica
-                    "origen": "03"
+                    "monto": 0,
+                    "origen": "02"
                 }
             }
             
@@ -166,11 +156,12 @@ def obtener_otp_swagger(p, registros):
                 else:
                     fila['otp_encontrada'] = ""
                     fila['estado_otp'] = "Sin OTP en JSON"
-                    print("⚠️ Respuesta recibida pero sin campo 'otp'")
-            except Exception:
+                    # NUEVO: Imprime lo que la API respondió de verdad para auditar el fallo
+                    print(f"❌ API rechazó la solicitud. Respuesta del servidor:\n{res_txt}")
+            except Exception as e:
                 fila['otp_encontrada'] = ""
                 fila['estado_otp'] = "Error respuesta OTP"
-                print(f"❌ No se pudo extraer la OTP de la respuesta.")
+                print(f"❌ Error al intentar leer la respuesta: {e}")
                 
             time.sleep(0.5)
             
@@ -178,9 +169,8 @@ def obtener_otp_swagger(p, registros):
         browser.close()
     return registros
 
-
 # =========================================================================
-#  FASE 2: EJECUTAR EL COBRO COMERCIO C2P (CON TELÉFONOS EN FORMATO 58...)
+#  FASE 2: EJECUTAR EL COBRO COMERCIO C2P
 # =========================================================================
 def ejecutar_cobro_c2p(p, registros):
     print("\n🚀 [FASE 2] Iniciando procesamiento de Cobros Comercio C2P...")
@@ -235,7 +225,6 @@ def ejecutar_cobro_c2p(p, registros):
                 resultados_finales.append(fila_res)
                 continue
 
-            # JSON estructurado para el Cobro C2P - Ambos teléfonos formateados con 58...
             payload_cobro = {
                 "idCliente": id_cliente,
                 "idUsuario": "usuario_beca",
@@ -244,12 +233,12 @@ def ejecutar_cobro_c2p(p, registros):
                 "idConsumidor": str(fila.get('id_consumidor', id_cliente)).strip(),
                 "ipOrigen": "111.111.11.1",
                 "idPagador": str(fila.get('id_pagador', '')).strip(),
-                "telfPagador": limpiar_y_formatear_telefono(fila.get('telf_pagador', '')),    # <-- Formato 58...
-                "telfReceptor": limpiar_y_formatear_telefono(fila.get('telf_receptor', '')),  # <-- Formato 58...
+                "telfPagador": limpiar_y_formatear_telefono(fila.get('telf_pagador', '')),    
+                "telfReceptor": limpiar_y_formatear_telefono(fila.get('telf_receptor', '')),  
                 "ctaReceptor": str(fila.get('cta_receptor', '')).strip(),
                 "moneda": str(fila.get('moneda', 'VES')).strip(),
                 "concepto": str(fila.get('concepto', 'pago material')).strip(),
-                "monto": str(fila.get('monto', '10.5')).strip(),
+                "monto": str(fila.get('monto', '0')).strip(),
                 "otp": otp_usar, 
                 "codBanco": str(fila.get('cod_banco', '0115')).strip(),
                 "envioEMailPagador": True,
@@ -303,6 +292,14 @@ def ejecutar_cobro_c2p(p, registros):
 
 
 def main():
+    try:
+        from LeerXlsx import guardar_y_cerrar_excel
+        print(f"🔒 Verificando estados de bloqueo para los archivos Excel...")
+        guardar_y_cerrar_excel(ARCHIVO_ENTRADA)
+        guardar_y_cerrar_excel(ARCHIVO_EDITABLE)
+    except Exception as e:
+        print(f"ℹ️ No se pudo ejecutar el cierre automático de Excel: {e}")
+
     datos_a_procesar = leer_datos_entrada_directo(ARCHIVO_ENTRADA, PESTANA_ENTRADA)
     if not datos_a_procesar:
         print("⚠️ No hay registros válidos para trabajar. Proceso detenido.")
