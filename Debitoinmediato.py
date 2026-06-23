@@ -11,6 +11,10 @@ from playwright.sync_api import sync_playwright
 # =========================================================================
 #  FUNCIÓN LOCAL PARA RUTAS ABSOLUTAS EXTERNAS (CORREGIDA PARA .EXE)
 # =========================================================================
+
+def run():
+    main()
+
 def obtener_ruta_absoluta(nombre_archivo):
     if getattr(sys, 'frozen', False):
         directorio_ejecutable = os.path.dirname(sys.executable)
@@ -102,8 +106,6 @@ def obtener_otp_swagger(p, registros):
                 monto_otp = float(monto_raw) if monto_raw else 1.22
             except ValueError:
                 monto_otp = 1.22
-            
-            canal_raw = str(fila.get('id_canal', '1')).strip()
             
             if not id_pagador:
                 continue
@@ -199,7 +201,7 @@ def ejecutar_debito_inmediato(p, registros):
             id_cliente = str(fila.get('id_cliente_otp', '')).strip()
             cod_banco = str(fila.get('cod_banco', '')).strip().replace('´', '')
             telefono_OTP = str(fila.get('telefono_otp', '')).strip().replace('´', '')
-            cuenta_destino = str(fila.get('cuenta_destino', '')).strip().replace('´', '')
+            cuenta_debito = str(fila.get('cuenta_debito', '')).strip().replace('´', '')
             cuenta_origen = str(fila.get('cuenta_origen', '')).strip().replace('´', '')
             #print("Fila recibida:", fila)
             #print("cod_banco =", cod_banco)
@@ -247,12 +249,12 @@ def ejecutar_debito_inmediato(p, registros):
                                   "monto": str(fila.get('monto', '')).strip(),
                                   "concepto": str(fila.get('concepto', '')).strip(),
                                   "cobrador": {
-                                      "cuenta": cuenta_destino,
+                                      "cuenta": cuenta_debito,
                                       "telefono": "",
                                       "nombre": str(fila.get('nombre_debito', '')).strip()
                                       },
                                       "pagador": {
-                                          "pagadorId": str(fila.get('id_pagador', '')).strip(),
+                                          "pagadorId": str(fila.get('id_numero_otp', '')).strip(),
                                           "bancoCodigo": cod_banco,
                                           "cuenta": cuenta_origen,
                                           "telefono": telefono_OTP,

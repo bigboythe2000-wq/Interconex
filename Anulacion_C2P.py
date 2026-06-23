@@ -11,6 +11,9 @@ from playwright.sync_api import sync_playwright
 # =========================================================================
 #  FUNCIÓN LOCAL PARA RUTAS ABSOLUTAS EXTERNAS (CORREGIDA PARA .EXE)
 # =========================================================================
+def run():
+    main()
+    
 def obtener_ruta_absoluta(nombre_archivo):
     if getattr(sys, 'frozen', False):
         directorio_ejecutable = os.path.dirname(sys.executable)

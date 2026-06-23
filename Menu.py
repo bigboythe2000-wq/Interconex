@@ -9,6 +9,10 @@ from Transferencia import transferir
 from LeerXlsx import guardar_y_cerrar_excel
 from ObtenerRuta import resource_path
 from ListasdeBanco import run as lista_banco
+from Debitoinmediato import run as debitoinmediato
+from Cobro_Comercio_C2P import run as cobrocomercio
+from Anulacion_C2P import run as anulacion
+
 def limpiar_terminal():
     if os.name == 'nt':
         os.system('cls')
@@ -54,7 +58,10 @@ def main():
         print(f"{CYAN}║{RESET}  {VERDE}[5]{RESET} Realizar Pago Móvil                                  {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[6]{RESET} Realizar Transferencias                              {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[7]{RESET} Listar Bancos                                        {CYAN}║{RESET}")
-        print(f"{CYAN}║{RESET}  {AMARILLO}[8]{RESET} Reiniciar el archivo Solicitudes                     {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {VERDE}[8]{RESET} Debito inmediato                                     {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {VERDE}[9]{RESET} Cobro comercio C2P                                   {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {VERDE}[10]{RESET} Anulacion C2P                                       {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {AMARILLO}[11]{RESET} Reiniciar el archivo Solicitudes                    {CYAN}║{RESET}")
         print(f"{CYAN}╠═══════════════════════════════════════════════════════════╣{RESET}")
         print(f"{CYAN}║{RESET}  {ROJO}[0]{RESET} Salir del Menú                                       {CYAN}║{RESET}")
         print(f"{CYAN}╚═══════════════════════════════════════════════════════════╝{RESET}")
@@ -90,6 +97,18 @@ def main():
             guardar_y_cerrar_excel("Resultados.xlsx")
             lista_banco()
         elif opcion == "8":
+            guardar_y_cerrar_excel("Solicitudes.xlsx")
+            guardar_y_cerrar_excel("Resultados.xlsx")
+            debitoinmediato()
+        elif opcion == "9":
+            guardar_y_cerrar_excel("Solicitudes.xlsx")
+            guardar_y_cerrar_excel("Resultados.xlsx")
+            cobrocomercio()
+        elif opcion == "10":
+            guardar_y_cerrar_excel("Solicitudes.xlsx")
+            guardar_y_cerrar_excel("Resultados.xlsx")
+            anulacion()
+        elif opcion == "11":
             guardar_y_cerrar_excel("Solicitudes.xlsx")
             guardar_y_cerrar_excel("Resultados.xlsx")
             reiniciar_archivo_solicitudes()
