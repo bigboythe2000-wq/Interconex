@@ -146,7 +146,7 @@ def ejecutar_anulaciones(p, registros):
             page.keyboard.press("Backspace")
             textarea.fill(json.dumps(payload_anulacion, indent=2))
             print(f"📤 Enviando a excel")
-            bloque_api.locator("button.execute").click(timeout=5000)
+            bloque_api.locator("button.execute").click(timeout=5100)
             
             selector_res = ".responses-wrapper .response .highlight-code pre"
             

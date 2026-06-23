@@ -176,17 +176,17 @@ def ejecutar_debito_inmediato(p, registros):
     context = browser.new_context(viewport={'width': 1280, 'height': 800})
     page = context.new_page()
     
-    url_cobro = "http://172.19.160.160:7224/swagger-ui/index.html#/enviar-debito-controller/enviarDebito"
+    url_debito = "http://172.19.160.160:7224/swagger-ui/index.html#/enviar-debito-controller/enviarDebito"
     resultados_finales = []
     
     try:
-        page.goto(url_cobro, wait_until="load", timeout=90000)
+        page.goto(url_debito, wait_until="load", timeout=90000)
         bloque_api = page.locator(".opblock").first
         bloque_api.scroll_into_view_if_needed()
         
         if "is-open" not in (bloque_api.get_attribute("class") or ""):
             bloque_api.locator(".opblock-summary").click()
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(1500)
             
         btn_try = bloque_api.locator("button.try-out__btn")
         btn_try.wait_for(state="visible")
@@ -200,9 +200,9 @@ def ejecutar_debito_inmediato(p, registros):
         for i, fila in enumerate(registros):
             id_cliente = str(fila.get('id_cliente_otp', '')).strip()
             cod_banco = str(fila.get('cod_banco', '')).strip().replace('´', '')
-            telefono_OTP = str(fila.get('telefono_otp', '')).strip().replace('´', '')
-            cuenta_debito = str(fila.get('cuenta_debito', '')).strip().replace('´', '')
-            cuenta_origen = str(fila.get('cuenta_origen', '')).strip().replace('´', '')
+            telefono_pagador = str(fila.get('telefono_pagador', '')).strip().replace('´', '')
+            cuenta_credito = str(fila.get('cuenta_credito', '')).strip().replace('´', '')
+            cuenta_pagador = str(fila.get('cuenta_pagador', '')).strip().replace('´', '')
             #print("Fila recibida:", fila)
             #print("cod_banco =", cod_banco)
 
@@ -249,15 +249,15 @@ def ejecutar_debito_inmediato(p, registros):
                                   "monto": str(fila.get('monto', '')).strip(),
                                   "concepto": str(fila.get('concepto', '')).strip(),
                                   "cobrador": {
-                                      "cuenta": cuenta_debito,
+                                      "cuenta": cuenta_credito,
                                       "telefono": "",
-                                      "nombre": str(fila.get('nombre_debito', '')).strip()
+                                      "nombre": str(fila.get('nombre_credito', '')).strip()
                                       },
                                       "pagador": {
                                           "pagadorId": str(fila.get('id_numero_otp', '')).strip(),
                                           "bancoCodigo": cod_banco,
-                                          "cuenta": cuenta_origen,
-                                          "telefono": telefono_OTP,
+                                          "cuenta": cuenta_pagador,
+                                          "telefono": telefono_pagador,
                                           "nombre": str(fila.get('nombre_pagador', '')).strip()
                                           },
                                           "notificar": True,
@@ -268,8 +268,9 @@ def ejecutar_debito_inmediato(p, registros):
             page.keyboard.press("Control+A")
             page.keyboard.press("Backspace")
             textarea.fill(json.dumps(payload_debito, indent=2))
-            
-            bloque_api.locator("button.execute").click()
+
+            print(f"📤 Enviando a excel")
+            bloque_api.locator("button.execute").click(timeout=5000)
             
             selector_res = ".responses-wrapper .response .highlight-code pre"
             

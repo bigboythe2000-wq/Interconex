@@ -191,7 +191,7 @@ def ejecutar_cobro_c2p(p, registros):
         
         if "is-open" not in (bloque_api.get_attribute("class") or ""):
             bloque_api.locator(".opblock-summary").click()
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(1500)
             
         btn_try = bloque_api.locator("button.try-out__btn")
         btn_try.wait_for(state="visible")

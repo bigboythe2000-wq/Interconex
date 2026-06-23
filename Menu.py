@@ -58,7 +58,7 @@ def main():
         print(f"{CYAN}║{RESET}  {VERDE}[5]{RESET} Realizar Pago Móvil                                  {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[6]{RESET} Realizar Transferencias                              {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[7]{RESET} Listar Bancos                                        {CYAN}║{RESET}")
-        print(f"{CYAN}║{RESET}  {VERDE}[8]{RESET} Debito inmediato                                     {CYAN}║{RESET}")
+        print(f"{CYAN}║{RESET}  {VERDE}[8]{RESET} Debito Inmediato                                     {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[9]{RESET} Cobro comercio C2P                                   {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {VERDE}[10]{RESET} Anulacion C2P                                       {CYAN}║{RESET}")
         print(f"{CYAN}║{RESET}  {AMARILLO}[11]{RESET} Reiniciar el archivo Solicitudes                    {CYAN}║{RESET}")
