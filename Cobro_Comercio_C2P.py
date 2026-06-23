@@ -140,7 +140,7 @@ def obtener_otp_swagger(p, registros):
             page.keyboard.press("Control+A")
             page.keyboard.press("Backspace")
             textarea.fill(json.dumps(payload_otp, indent=2))
-            
+        
             bloque_api.locator("button.execute").click()
             
             selector_res = ".responses-wrapper .response .highlight-code pre"
@@ -253,8 +253,8 @@ def ejecutar_cobro_c2p(p, registros):
             page.keyboard.press("Control+A")
             page.keyboard.press("Backspace")
             textarea.fill(json.dumps(payload_cobro, indent=2))
-            
-            bloque_api.locator("button.execute").click()
+            print(f"📤 Enviando solicitud de Cobro C2P para Comercio: {id_cliente} con OTP: {otp_usar}")
+            bloque_api.locator("button.execute").click(timeout=5000)
             
             selector_res = ".responses-wrapper .response .highlight-code pre"
             
